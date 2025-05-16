@@ -1,0 +1,202 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgres"
+  url      = env("DATABASE_URL")
+}
+
+// Necessary for Next auth
+model Account {
+  id                String   @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?  @db.Text
+  access_token      String?  @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?  @db.Text
+  session_state     String?
+  user              User     @relation("UserToAccount", fields: [userId], references: [id], onDelete: Cascade)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model User {
+  id        String   @id @default(cuid())
+  firstName String?
+  lastName  String?
+  email     String?  @unique
+  password  String?
+  image     String?
+  phone     String?
+  role      String   @default("user")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  accounts      Account[]  @relation("UserToAccount")
+  customers     Customer[] @relation("CreatedByUser")
+  createdOrders Order[]
+}
+
+model Product {
+  id          String          @id @default(cuid())
+  sku         String          @unique
+  name        String
+  description String?
+  price       Decimal         @default(0)
+  costPrice   Decimal         @default(0)
+  quantity    Int             @default(0)
+  categoryId  String
+  taxId       String
+  tax         ProductTax      @relation("TaxToProduct", fields: [taxId], references: [id])
+  unitId      String
+  unit        ProductUnit     @relation("UnitToProduct", fields: [unitId], references: [id])
+  images      ProductImage[]  @relation("ImageToProduct")
+  category    ProductCategory @relation("CategoryToProduct", fields: [categoryId], references: [id])
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  orderLines  OrderLine[]
+
+  @@index(name)
+  @@index([categoryId])
+  @@index([unitId])
+  @@index([taxId])
+}
+
+model CodeRule {
+  id          String   @id @default(cuid())
+  name        String
+  type        String
+  description String?
+  active      Boolean  @default(false)
+  autoNumber  Int      @default(1)
+  delimiter   String   @db.VarChar(1)
+  prefix      String?
+  suffix      String?
+  rule        String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ProductCategory {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  products    Product[] @relation("CategoryToProduct")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model ProductImage {
+  id        String   @id @default(cuid())
+  url       String
+  productId String
+  product   Product  @relation("ImageToProduct", fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([productId])
+}
+
+model ProductUnit {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  products Product[] @relation("UnitToProduct")
+}
+
+model ProductTax {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  percentage  Decimal
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  products Product[] @relation("TaxToProduct")
+}
+
+model Customer {
+  id          String    @id @default(cuid())
+  description String?
+  name        String
+  code        String
+  dob         DateTime? @db.Date
+  gender      String?
+  address     String?
+  phone       String?   @unique
+  email       String?   @unique
+  companyName String?
+  taxId       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  createdById String
+
+  createdByUser User    @relation("CreatedByUser", fields: [createdById], references: [id])
+  orders        Order[]
+
+  @@index([createdById])
+}
+
+model Order {
+  id           String      @id @default(cuid())
+  trackingId   String      @unique
+  customerId   String
+  status       String
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  deliveryDate DateTime?
+  paidDate     DateTime?
+  createdById  String
+  paidAmount   Decimal     @default(0)
+  discount     Decimal     @default(0)
+  total        Decimal
+  orderLines   OrderLine[]
+
+  user     User     @relation(fields: [createdById], references: [id])
+  customer Customer @relation(fields: [customerId], references: [id])
+
+  @@index([customerId])
+  @@index([createdById])
+}
+
+model OrderLine {
+  id        String   @id @default(cuid())
+  orderId   String
+  productId String
+  quantity  Decimal  @default(1)
+  unitPrice Decimal
+  tax       Decimal  @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  order   Order   @relation(fields: [orderId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+
+  @@index([orderId])
+  @@index([productId])
+}
+
+model Setting {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  value       Json
+  type        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

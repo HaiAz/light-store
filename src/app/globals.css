@@ -1,0 +1,115 @@
+body {
+  font-family: "DM Sans", sans-serif;
+}
+
+option {
+  color: black;
+}
+@font-face {
+  font-family: "DM Sans";
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url(/fonts/dm-sans/DMSans-Italic.ttf) format("truetype");
+}
+
+/* @font-face {
+  font-family: 'DM Sans';
+  font-style: italic;
+  font-weight: 500;
+  font-display: swap;
+  src: url(/fonts/dm-sans/DMSans-Italic.ttf) format('truetype');
+} */
+
+@font-face {
+  font-family: "DM Sans";
+  font-style: italic;
+  font-weight: 700;
+  font-display: swap;
+  src: url(/fonts/dm-sans/DMSans-BoldItalic.ttf) format("truetype");
+}
+
+@font-face {
+  font-family: "DM Sans";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(/fonts/dm-sans/DMSans-Regular.ttf) format("truetype");
+}
+
+@font-face {
+  font-family: "DM Sans";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(/fonts/dm-sans/DMSans-Medium.ttf) format("truetype");
+}
+
+@font-face {
+  font-family: "DM Sans";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(/fonts/dm-sans/DMSans-Bold.ttf) format("truetype");
+}
+
+/* Printing styles */
+@media print {
+  html,
+  body {
+    height: initial !important;
+    overflow: initial !important;
+    print-color-adjust: exact;
+  }
+
+  @page {
+    size: portrait;
+  }
+
+  body {
+    margin: 1.6cm;
+  }
+
+  .print-container .chakra-table tfoot tr .print-total {
+    text-align: right;
+    margin-left: auto;
+    padding-right: 40px;
+  }
+
+  .print-container .chakra-table tfoot tr .print-amount {
+    text-align: left;
+  }
+
+  .print-container thead tr th {
+    padding-top: 48px;
+  }
+
+  .print-container th {
+    font-size: 12px;
+    padding: 8px 0;
+    color: black;
+    font-weight: bold;
+  }
+
+  .print-container td {
+    font-size: 10px;
+    padding: 4px 0 16px 0;
+  }
+
+  .print-container .print-table-footer-height {
+    display: block;
+  }
+
+  .print-footer {
+    position: fixed;
+    z-index: 9;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    font-size: 12px;
+  }
+
+  .print-text-stack {
+    font-size: 12px;
+  }
+}
